@@ -1,0 +1,115 @@
+<div class="container" dir="rtl">
+  <h1>ניהול פניות</h1>
+
+  <app-summary></app-summary>
+
+  <div class="filters">
+    <input
+      type="text"
+      placeholder="חיפוש בכותרת או ארגון..."
+      (input)="onSearchChange($any($event.target).value)"
+    />
+
+    <select [(ngModel)]="query.status" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="undefined">כל הסטטוסים</option>
+      @for (s of statusValues; track s) {
+        <option [ngValue]="s">{{ StatusLabels[s] }}</option>
+      }
+    </select>
+
+    <select [(ngModel)]="query.priority" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="undefined">כל העדיפויות</option>
+      @for (p of priorityValues; track p) {
+        <option [ngValue]="p">{{ PriorityLabels[p] }}</option>
+      }
+    </select>
+
+    <input
+      type="text"
+      placeholder="שם ארגון"
+      [(ngModel)]="query.organizationName"
+      (ngModelChange)="onFilterChange()"
+    />
+
+    <input
+      type="text"
+      placeholder="מטפל"
+      [(ngModel)]="query.assignedTo"
+      (ngModelChange)="onFilterChange()"
+    />
+  </div>
+
+  @if (selectedIds().size > 0) {
+    <div class="bulk-bar">
+      <span>{{ selectedIds().size }} פניות נבחרו</span>
+      <select [(ngModel)]="bulkStatus">
+        <option [ngValue]="null">בחר סטטוס...</option>
+        @for (s of statusValues; track s) {
+          <option [ngValue]="s">{{ StatusLabels[s] }}</option>
+        }
+      </select>
+      <button (click)="applyBulk()">עדכן נבחרות</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="state">טוען...</div>
+  }
+
+  @if (error()) {
+    <div class="state error">{{ error() }}</div>
+  }
+
+  @if (!loading() && !error() && result() && result()!.items.length === 0) {
+    <div class="state">לא נמצאו פניות.</div>
+  }
+
+  @if (!loading() && !error() && result() && result()!.items.length > 0) {
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" [checked]="allSelected()" (change)="toggleSelectAll()" /></th>
+          <th (click)="onSort('Title')">כותרת ⇅</th>
+          <th (click)="onSort('OrganizationName')">ארגון ⇅</th>
+          <th (click)="onSort('Status')">סטטוס ⇅</th>
+          <th (click)="onSort('Priority')">עדיפות ⇅</th>
+          <th>מטפל</th>
+          <th (click)="onSort('CreatedAt')">נוצר ⇅</th>
+          <th>פעולות</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (req of result()!.items; track req.id) {
+          <tr>
+            <td><input type="checkbox" [checked]="isSelected(req.id)" (change)="toggleSelect(req.id)" /></td>
+            <td>{{ req.title }}</td>
+            <td>{{ req.organizationName }}</td>
+            <td>{{ StatusLabels[req.status] }}</td>
+            <td>{{ PriorityLabels[req.priority] }}</td>
+            <td>{{ req.assignedTo }}</td>
+            <td>{{ req.createdAt | date:'short' }}</td>
+            <td class="actions">
+              <select (change)="changeStatus(req, +$any($event.target).value)">
+                <option value="">שנה סטטוס...</option>
+                @for (s of statusValues; track s) {
+                  <option [value]="s">{{ StatusLabels[s] }}</option>
+                }
+              </select>
+              <button (click)="openHistory(req.id)">היסטוריה</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <button [disabled]="!result()!.hasPrevious" (click)="goToPage(query.pageNumber - 1)">הקודם</button>
+      <span>עמוד {{ result()!.pageNumber }} מתוך {{ result()!.totalPages }} (סה"כ {{ result()!.totalCount }})</span>
+      <button [disabled]="!result()!.hasNext" (click)="goToPage(query.pageNumber + 1)">הבא</button>
+    </div>
+  }
+
+  @if (historyRequestId() !== null) {
+    <app-history-dialog [requestId]="historyRequestId()!" (close)="closeHistory()"></app-history-dialog>
+  }
+</div>

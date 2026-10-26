@@ -1,0 +1,26 @@
+@if (summary()) {
+  <div class="summary" dir="rtl">
+    <div class="group">
+      <h3>פניות לפי סטטוס</h3>
+      <div class="cards">
+        @for (entry of toEntries(summary()!.countByStatus, statusLabels); track entry.label) {
+          <div class="card">
+            <span class="count">{{ entry.count }}</span>
+            <span class="label">{{ entry.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+    <div class="group">
+      <h3>פניות לפי עדיפות</h3>
+      <div class="cards">
+        @for (entry of toEntries(summary()!.countByPriority, priorityLabels); track entry.label) {
+          <div class="card">
+            <span class="count">{{ entry.count }}</span>
+            <span class="label">{{ entry.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

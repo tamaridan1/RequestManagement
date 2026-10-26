@@ -1,0 +1,35 @@
+<div class="overlay" (click)="onClose()" dir="rtl">
+  <div class="dialog" (click)="$event.stopPropagation()">
+    <div class="header">
+      <h3>היסטוריית שינויים</h3>
+      <button class="close-btn" (click)="onClose()">✕</button>
+    </div>
+
+    @if (loading()) {
+      <p>טוען...</p>
+    } @else if (history().length === 0) {
+      <p>אין היסטוריית שינויים.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>מ-</th>
+            <th>ל-</th>
+            <th>מתי</th>
+            <th>מי</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (h of history(); track h.id) {
+            <tr>
+              <td>{{ StatusLabels[h.previousStatus] }}</td>
+              <td>{{ StatusLabels[h.newStatus] }}</td>
+              <td>{{ h.changedAt | date:'short' }}</td>
+              <td>{{ h.changedBy }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

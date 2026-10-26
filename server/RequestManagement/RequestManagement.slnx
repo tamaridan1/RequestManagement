@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="RequestManagementAPI/RequestManagementAPI.csproj" />
+  <Project Path="RequestManagementBL/RequestManagementBL.csproj" />
+  <Project Path="RequestManagementDAL/RequestManagementDAL.csproj" />
+  <Project Path="RequestManagementDTO/RequestManagementDTO.csproj" />
+  <Project Path="RequestManagement.Tests/RequestManagement.Tests.csproj" />
+</Solution>
